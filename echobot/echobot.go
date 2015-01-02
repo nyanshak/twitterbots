@@ -5,7 +5,7 @@ import (
 	"flag"
 	"github.com/ChimeraCoder/anaconda"
 	"github.com/garyburd/go-oauth/oauth"
-	"github.com/nyanshak/twitterbots-lib"
+	tl "github.com/nyanshak/twitterlib"
 	"log"
 	"net/http"
 	"time"
@@ -68,7 +68,7 @@ func echoer() {
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Set("Authorization", myOauth.AuthorizationHeader(myCredentials, "GET", req.URL, nil))
 
-	conn := NewConnection(0 * time.Second)
+	conn := tl.NewConnection(0 * time.Second)
 
 	resp, err := conn.Client.Do(req)
 
