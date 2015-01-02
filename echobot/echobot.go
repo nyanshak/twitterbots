@@ -1,10 +1,11 @@
 package main 
 
+
 import (
 	"flag"
 	"github.com/ChimeraCoder/anaconda"
 	"github.com/garyburd/go-oauth/oauth"
-	"github.com/nyanshak/twitterbots"
+	"github.com/nyanshak/twitterbots-lib"
 	"log"
 	"net/http"
 	"time"
