@@ -1,19 +1,16 @@
-package main
+package main 
 
 import (
 	"flag"
 	"github.com/ChimeraCoder/anaconda"
 	"github.com/garyburd/go-oauth/oauth"
-	"github.com/nyanshak/twitter-bots/connection"
+	"github.com/nyanshak/twitterbots"
 	"log"
 	"net/http"
-	"net"
-	"io"
 	"time"
 	"os"
 	"strings"
 	"io/ioutil"
-	"encoding/json"
 )
 
 var (
@@ -84,7 +81,7 @@ func echoer() {
 		log.Fatalln("Error getting status stream (%d): %s", resp.StatusCode, body)
 	}
 
-	conn.setup(resp.Body)
+	conn.Setup(resp.Body)
 
 	for {
 		if tweet, err := conn.Next(); err == nil {

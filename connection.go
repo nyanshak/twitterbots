@@ -1,4 +1,13 @@
-package twitterbots-connection
+package twitterbots
+
+import (
+	"github.com/ChimeraCoder/anaconda"
+	"net"
+	"io"
+	"encoding/json"
+	"net/http"
+	"time"
+)
 
 type Connection struct {
 	decoder *json.Decoder
@@ -11,7 +20,7 @@ type Connection struct {
 func (c *Connection) Close() error {
 	// Have to close the raw connection, since closing the response body reader
 	// will make Go try to read the request, which goes on forever.
-	if err := c.conn.Close(); err != nil {
+	if err := c.Conn.Close(); err != nil {
 		c.closer.Close()
 		return err
 	}
@@ -21,7 +30,7 @@ func (c *Connection) Close() error {
 func (c *Connection) Next() (*anaconda.Tweet, error) {
 	var tweet anaconda.Tweet
 	if c.timeout != 0 {
-		c.conn.SetReadDeadline(time.Now().Add(c.timeout))
+		c.Conn.SetReadDeadline(time.Now().Add(c.timeout))
 	}
 	if err := c.decoder.Decode(&tweet); err != nil {
 		return nil, err
@@ -35,21 +44,21 @@ func (c *Connection) Setup(rc io.ReadCloser) {
 }
 
 func NewConnection(timeout time.Duration) *Connection {
-	conn := &Connection{timeout: timeout}
+	Conn := &Connection{timeout: timeout}
 	dialer := func(netw, addr string) (net.Conn, error) {
 		netc, err := net.DialTimeout(netw, addr, 5 * time.Second)
 		if err != nil {
 			return nil, err
 		}
-		conn.conn = netc
+		Conn.Conn = netc
 		return netc, nil
 	}
 
-	conn.Client = &http.Client{
+	Conn.Client = &http.Client{
 		Transport: &http.Transport{
 			Dial: dialer,
 		},
 	}
 
-	return conn
+	return Conn
 }
