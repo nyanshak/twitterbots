@@ -1,4 +1,4 @@
-package "github.com/nyanshak/twitterbots/connection"
+package twitterbots-connection
 
 type Connection struct {
 	decoder *json.Decoder
