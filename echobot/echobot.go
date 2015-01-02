@@ -88,7 +88,7 @@ func echoer() {
 		if tweet, err := conn.Next(); err == nil {
 			// avoid having bot infinitely retweet itself
 			if !strings.EqualFold(tweet.User.ScreenName, screenName) {
-				api.PostTweet(tweet.Text, nil)
+				api.Retweet(tweet.Id, false)
 			}
 		} else {
 			log.Fatalln("decoding tweet failed: %s", err)
