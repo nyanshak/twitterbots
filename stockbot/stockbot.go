@@ -65,7 +65,7 @@ func quoter() {
 
 	req, err := http.NewRequest("GET", "https://userstream.twitter.com/1.1/user.json?with=user", nil)
 	if err != nil {
-		log.Fatalln("Failed to create status stream: %s", err)
+		log.Fatalf("Failed to create status stream: %s\n", err)
 	}
 
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
@@ -76,13 +76,13 @@ func quoter() {
 	resp, err := conn.Client.Do(req)
 
 	if err != nil {
-		log.Fatalln("Error getting status stream: %s", err)
+		log.Fatalf("Error getting status stream: %s\n", err)
 	}
 
 	if resp.StatusCode != 200 {
 		body, _ := ioutil.ReadAll(resp.Body)
 		resp.Body.Close()
-		log.Fatalln("Error getting status stream (%d): %s", resp.StatusCode, body)
+		log.Fatalf("Error getting status stream (%d): %s\n", resp.StatusCode, body)
 	}
 
 	conn.Setup(resp.Body)
@@ -98,7 +98,7 @@ func quoter() {
 				}
 			}
 		} else {
-			log.Fatalln("decoding tweet failed: %s", err)
+			log.Fatalf("decoding tweet failed: %s\n", err)
 		}
 	}
 }
@@ -159,6 +159,6 @@ func getQuotesFromTweet(tweet anaconda.Tweet) []string {
 func main() {
 	err := http.ListenAndServe(*listen, nil)
 	if err != nil {
-		log.Fatalf("failed to listen: %s", err)
+		log.Fatalf("failed to listen: %s\n", err)
 	}
 }

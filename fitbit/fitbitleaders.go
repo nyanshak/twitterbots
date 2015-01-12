@@ -1,6 +1,5 @@
 package main 
 
-
 import (
 	"flag"
 	"github.com/ChimeraCoder/anaconda"
@@ -12,6 +11,7 @@ import (
 	"os"
 	"strings"
 	"io/ioutil"
+	"strconv"
 )
 
 var (
@@ -19,13 +19,13 @@ var (
 	myOauth       *oauth.Client
 	myCredentials *oauth.Credentials
 
-	consumerKey = os.Getenv("ECHO_CONSUMER_KEY")
-	consumerSecret = os.Getenv("ECHO_CONSUMER_SECRET")
-	accessKey = os.Getenv("ECHO_ACCESS_KEY")
-	accessSecret = os.Getenv("ECHO_ACCESS_SECRET")
+	consumerKey		= os.Getenv("TWEET_FIT_CONSUMER_KEY")
+	consumerSecret	= os.Getenv("TWEET_FIT_CONSUMER_SECRET")
+	accessKey		= os.Getenv("TWEET_FIT_ACCESS_KEY")
+	accessSecret	= os.Getenv("TWEET_FIT_ACCESS_SECRET")
 
-	screenName     = os.Getenv("ECHO_NAME")
-	listen         = flag.String("listen", ":8080", "Spec to listen on")
+	screenName		= os.Getenv("TWEET_FIT_NAME")
+	listen			= flag.String("listen", ":8080", "Spec to listen on")
 )
 
 func init() {
@@ -55,14 +55,14 @@ func init() {
 		Secret: accessSecret,
 	}
 
-	go echoer()
+	go measureStats()
 }
 
-func echoer() {
+func measureStats() {
 
-	req, err := http.NewRequest("GET", "https://userstream.twitter.com/1.1/user.json?with=user", nil)
+	req, err := http.NewRequest("POST", "https://stream.twitter.com/1.1/statuses/filter.json?track=fitstats_en_us", nil)
 	if err != nil {
-		log.Fatalf("Failed to create status stream: %s\n", err)
+		log.Fatalf("Failed to create stream: %s\n", err)
 	}
 
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
@@ -73,13 +73,13 @@ func echoer() {
 	resp, err := conn.Client.Do(req)
 
 	if err != nil {
-		log.Fatalf("Error getting status stream: %s\n", err)
+		log.Fatalf("Error getting stream: %s\n", err)
 	}
 
 	if resp.StatusCode != 200 {
 		body, _ := ioutil.ReadAll(resp.Body)
 		resp.Body.Close()
-		log.Fatalf("Error getting status stream (%d): %s\n", resp.StatusCode, body)
+		log.Fatalf("Error getting stream (%d): %s\n", resp.StatusCode, body)
 	}
 
 	conn.Setup(resp.Body)
@@ -88,12 +88,16 @@ func echoer() {
 		if tweet, err := conn.Next(); err == nil {
 			// avoid having bot infinitely retweet itself
 			if !strings.EqualFold(tweet.User.ScreenName, screenName) {
-				api.Retweet(tweet.Id, false)
+				log.Println(tweet)
 			}
 		} else {
 			log.Fatalf("decoding tweet failed: %s\n", err)
 		}
 	}
+}
+
+func floatToString(f float64) string {
+	return strconv.FormatFloat(f, 'f', 3, 64)
 }
 
 func main() {
